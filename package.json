@@ -1,0 +1,19 @@
+{
+  "name": "mixxxdj-mapping-ddjrx",
+  "version": "1.0.0",
+  "description": "Marcus McBride, 2026 Made In California",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/marcusmcb/mixxxdj-mapping-ddjrx.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/marcusmcb/mixxxdj-mapping-ddjrx/issues"
+  },
+  "homepage": "https://github.com/marcusmcb/mixxxdj-mapping-ddjrx#readme"
+}
