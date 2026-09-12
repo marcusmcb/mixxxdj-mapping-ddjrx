@@ -6,6 +6,7 @@
 /* global midi                                                        */
 /* global bpm                                                         */
 /* global components                                                  */
+/* global ColorMapper                                                  */
 ////////////////////////////////////////////////////////////////////////
 var PioneerDDJRX = function() {};
 
@@ -135,6 +136,14 @@ PioneerDDJRX.activePadMode = [
     PioneerDDJRX.padModes.hotCue
 ];
 PioneerDDJRX.samplerVelocityMode = [false, false, false, false];
+
+PioneerDDJRX.hotCueColorMap = new ColorMapper({
+    0x0000CC: 0x7F,
+    0x00CCCC: 0x10,
+    0xCCCC00: 0x20,
+    0xCC00CC: 0x30,
+    0xFFFFFF: 0x40
+});
 
 // FX storage:
 PioneerDDJRX.fxKnobMSBValue = [0, 0];
@@ -406,8 +415,23 @@ PioneerDDJRX.init = function(id) {
 
     // bind controls and init deck parameters:
     PioneerDDJRX.bindNonDeckControlConnections(true);
+    PioneerDDJRX.hotCueComponents = {};
     for (var index in PioneerDDJRX.channelGroups) {
         if (PioneerDDJRX.channelGroups.hasOwnProperty(index)) {
+            PioneerDDJRX.hotCueComponents[index] = [];
+            for (var hotCueIndex = 0; hotCueIndex < 8; hotCueIndex++) {
+                PioneerDDJRX.hotCueComponents[index][hotCueIndex] = new components.HotcueButton({
+                    midi: [0x97 + PioneerDDJRX.channelGroups[index], hotCueIndex],
+                    sendShifted: true,
+                    shiftControl: true,
+                    shiftOffset: 0x08,
+                    number: hotCueIndex + 1,
+                    group: index,
+                    on: 0x7F,
+                    off: 0x00,
+                    colorMapper: PioneerDDJRX.hotCueColorMap
+                });
+            }
             PioneerDDJRX.initDeck(index);
         }
     }
@@ -435,6 +459,14 @@ PioneerDDJRX.init = function(id) {
 };
 
 PioneerDDJRX.shutdown = function() {
+    for (var group in PioneerDDJRX.hotCueComponents) {
+        if (PioneerDDJRX.hotCueComponents.hasOwnProperty(group)) {
+            for (var hotCueIndex = 0; hotCueIndex < PioneerDDJRX.hotCueComponents[group].length; hotCueIndex++) {
+                PioneerDDJRX.hotCueComponents[group][hotCueIndex].disconnect();
+            }
+        }
+    }
+
     PioneerDDJRX.resetDeck("[Channel1]");
     PioneerDDJRX.resetDeck("[Channel2]");
     PioneerDDJRX.resetDeck("[Channel3]");
@@ -638,10 +670,6 @@ PioneerDDJRX.bindDeckControlConnections = function(channelGroup, bind) {
             'sync_enabled': 'PioneerDDJRX.syncLed',
             'beat_active': 'PioneerDDJRX.slicerBeatActive'
         };
-
-    for (i = 1; i <= 8; i++) {
-        controlsToFunctions["hotcue_" + i + "_enabled"] = "PioneerDDJRX.hotCueLeds";
-    }
 
     for (index in PioneerDDJRX.selectedLoopIntervals[deck]) {
         if (PioneerDDJRX.selectedLoopIntervals[deck].hasOwnProperty(index)) {
@@ -2025,19 +2053,6 @@ PioneerDDJRX.beatlooprollLeds = function(value, group, control) {
                 padNum = index % 8;
                 PioneerDDJRX.padLedControl(group, PioneerDDJRX.ledGroups.loopRoll, padNum, shifted, value);
             }
-        }
-    }
-};
-
-PioneerDDJRX.hotCueLeds = function(value, group, control) {
-    var padNum = null,
-        hotCueNum;
-
-    for (hotCueNum = 1; hotCueNum <= 8; hotCueNum++) {
-        if (control === "hotcue_" + hotCueNum + "_enabled") {
-            padNum = (hotCueNum - 1);
-            PioneerDDJRX.padLedControl(group, PioneerDDJRX.ledGroups.hotCue, padNum, false, value);
-            PioneerDDJRX.padLedControl(group, PioneerDDJRX.ledGroups.hotCue, padNum, true, value);
         }
     }
 };
