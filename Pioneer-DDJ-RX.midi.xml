@@ -976,6 +976,46 @@
             </control>
             <control>
                 <group>[Channel1]</group>
+                <key>PioneerDDJRX.parameterRight</key>
+                <description>Double beatjump_size, Button: PARAMETER1 RIGHT (in GROUP1-Mode, Deck 1 active)</description>
+                <status>0x90</status>
+                <midino>0x30</midino>
+                <options>
+                    <script-binding/>
+                </options>
+            </control>
+            <control>
+                <group>[Channel1]</group>
+                <key>PioneerDDJRX.parameterLeft</key>
+                <description>Halve beatjump_size, Button: PARAMETER1 LEFT (in GROUP1-Mode, Deck 1 active)</description>
+                <status>0x90</status>
+                <midino>0x28</midino>
+                <options>
+                    <script-binding/>
+                </options>
+            </control>
+            <control>
+                <group>[Channel1]</group>
+                <key>PioneerDDJRX.shiftParameterRight</key>
+                <description>Double beatjump_size, Button: PARAMETER2 RIGHT (in GROUP1-Mode, Deck 1 active)</description>
+                <status>0x90</status>
+                <midino>0x7D</midino>
+                <options>
+                    <script-binding/>
+                </options>
+            </control>
+            <control>
+                <group>[Channel1]</group>
+                <key>PioneerDDJRX.shiftParameterLeft</key>
+                <description>Halve beatjump_size, Button: PARAMETER2 LEFT (in GROUP1-Mode, Deck 1 active)</description>
+                <status>0x90</status>
+                <midino>0x05</midino>
+                <options>
+                    <script-binding/>
+                </options>
+            </control>
+            <control>
+                <group>[Channel1]</group>
                 <key>PioneerDDJRX.hotCueButtons</key>
                 <description>Hot-Cue 1 Deck 1, Button: PAD1 (in HOT-CUE-Mode, Deck 1 active)</description>
                 <status>0x97</status>
@@ -1616,6 +1656,86 @@
             </control>
             <control>
                 <group>[Channel1]</group>
+                <key>PioneerDDJRX.beatjumpButtons</key>
+                <description>Beatjump -4 Beats Deck 1, Button: PAD1 (in GROUP1-Mode, Deck 1 active)</description>
+                <status>0x97</status>
+                <midino>0x40</midino>
+                <options>
+                    <script-binding/>
+                </options>
+            </control>
+            <control>
+                <group>[Channel1]</group>
+                <key>PioneerDDJRX.beatjumpButtons</key>
+                <description>Beatjump +4 Beats Deck 1, Button: PAD2 (in GROUP1-Mode, Deck 1 active)</description>
+                <status>0x97</status>
+                <midino>0x41</midino>
+                <options>
+                    <script-binding/>
+                </options>
+            </control>
+            <control>
+                <group>[Channel1]</group>
+                <key>PioneerDDJRX.beatjumpButtons</key>
+                <description>Beatjump -8 Beats Deck 1, Button: PAD3 (in GROUP1-Mode, Deck 1 active)</description>
+                <status>0x97</status>
+                <midino>0x42</midino>
+                <options>
+                    <script-binding/>
+                </options>
+            </control>
+            <control>
+                <group>[Channel1]</group>
+                <key>PioneerDDJRX.beatjumpButtons</key>
+                <description>Beatjump +8 Beats Deck 1, Button: PAD4 (in GROUP1-Mode, Deck 1 active)</description>
+                <status>0x97</status>
+                <midino>0x43</midino>
+                <options>
+                    <script-binding/>
+                </options>
+            </control>
+            <control>
+                <group>[Channel1]</group>
+                <key>PioneerDDJRX.beatjumpButtons</key>
+                <description>Beatjump -16 Beats Deck 1, Button: PAD5 (in GROUP1-Mode, Deck 1 active)</description>
+                <status>0x97</status>
+                <midino>0x44</midino>
+                <options>
+                    <script-binding/>
+                </options>
+            </control>
+            <control>
+                <group>[Channel1]</group>
+                <key>PioneerDDJRX.beatjumpButtons</key>
+                <description>Beatjump +16 Beats Deck 1, Button: PAD6 (in GROUP1-Mode, Deck 1 active)</description>
+                <status>0x97</status>
+                <midino>0x45</midino>
+                <options>
+                    <script-binding/>
+                </options>
+            </control>
+            <control>
+                <group>[Channel1]</group>
+                <key>PioneerDDJRX.beatjumpButtons</key>
+                <description>Beatjump -32 Beats Deck 1, Button: PAD7 (in GROUP1-Mode, Deck 1 active)</description>
+                <status>0x97</status>
+                <midino>0x46</midino>
+                <options>
+                    <script-binding/>
+                </options>
+            </control>
+            <control>
+                <group>[Channel1]</group>
+                <key>PioneerDDJRX.beatjumpButtons</key>
+                <description>Beatjump +32 Beats Deck 1, Button: PAD8 (in GROUP1-Mode, Deck 1 active)</description>
+                <status>0x97</status>
+                <midino>0x47</midino>
+                <options>
+                    <script-binding/>
+                </options>
+            </control>
+            <control>
+                <group>[Channel1]</group>
                 <key>PioneerDDJRX.toggleHotCueMode</key>
                 <description>Set PAD-Mode, Button: HOT CUE LEFT (Deck 1 active)</description>
                 <status>0x90</status>
@@ -1670,6 +1790,16 @@
                 <description>Set PAD-Mode, Button: SHIFT ROLL LEFT (Deck 1 active)</description>
                 <status>0x90</status>
                 <midino>0x6B</midino>
+                <options>
+                    <script-binding/>
+                </options>
+            </control>
+            <control>
+                <group>[Channel1]</group>
+                <key>PioneerDDJRX.toggleBeatJumpMode</key>
+                <description>Set PAD-Mode, Button: SHIFT HOT CUE LEFT (Deck 1 active)</description>
+                <status>0x90</status>
+                <midino>0x69</midino>
                 <options>
                     <script-binding/>
                 </options>
@@ -2446,6 +2576,46 @@
             </control>
             <control>
                 <group>[Channel2]</group>
+                <key>PioneerDDJRX.parameterRight</key>
+                <description>Double beatjump_size, Button: PARAMETER1 RIGHT (in GROUP1-Mode, Deck 2 active)</description>
+                <status>0x91</status>
+                <midino>0x30</midino>
+                <options>
+                    <script-binding/>
+                </options>
+            </control>
+            <control>
+                <group>[Channel2]</group>
+                <key>PioneerDDJRX.parameterLeft</key>
+                <description>Halve beatjump_size, Button: PARAMETER1 LEFT (in GROUP1-Mode, Deck 2 active)</description>
+                <status>0x91</status>
+                <midino>0x28</midino>
+                <options>
+                    <script-binding/>
+                </options>
+            </control>
+            <control>
+                <group>[Channel2]</group>
+                <key>PioneerDDJRX.shiftParameterRight</key>
+                <description>Double beatjump_size, Button: PARAMETER2 RIGHT (in GROUP1-Mode, Deck 2 active)</description>
+                <status>0x91</status>
+                <midino>0x7D</midino>
+                <options>
+                    <script-binding/>
+                </options>
+            </control>
+            <control>
+                <group>[Channel2]</group>
+                <key>PioneerDDJRX.shiftParameterLeft</key>
+                <description>Halve beatjump_size, Button: PARAMETER2 LEFT (in GROUP1-Mode, Deck 2 active)</description>
+                <status>0x91</status>
+                <midino>0x05</midino>
+                <options>
+                    <script-binding/>
+                </options>
+            </control>
+            <control>
+                <group>[Channel2]</group>
                 <key>PioneerDDJRX.hotCueButtons</key>
                 <description>Hot-Cue 1 Deck 2, Button: PAD1 (in HOT-CUE-Mode, Deck 2 active)</description>
                 <status>0x98</status>
@@ -3086,6 +3256,86 @@
             </control>
             <control>
                 <group>[Channel2]</group>
+                <key>PioneerDDJRX.beatjumpButtons</key>
+                <description>Beatjump -4 Beats Deck 2, Button: PAD1 (in GROUP1-Mode, Deck 2 active)</description>
+                <status>0x98</status>
+                <midino>0x40</midino>
+                <options>
+                    <script-binding/>
+                </options>
+            </control>
+            <control>
+                <group>[Channel2]</group>
+                <key>PioneerDDJRX.beatjumpButtons</key>
+                <description>Beatjump +4 Beats Deck 2, Button: PAD2 (in GROUP1-Mode, Deck 2 active)</description>
+                <status>0x98</status>
+                <midino>0x41</midino>
+                <options>
+                    <script-binding/>
+                </options>
+            </control>
+            <control>
+                <group>[Channel2]</group>
+                <key>PioneerDDJRX.beatjumpButtons</key>
+                <description>Beatjump -8 Beats Deck 2, Button: PAD3 (in GROUP1-Mode, Deck 2 active)</description>
+                <status>0x98</status>
+                <midino>0x42</midino>
+                <options>
+                    <script-binding/>
+                </options>
+            </control>
+            <control>
+                <group>[Channel2]</group>
+                <key>PioneerDDJRX.beatjumpButtons</key>
+                <description>Beatjump +8 Beats Deck 2, Button: PAD4 (in GROUP1-Mode, Deck 2 active)</description>
+                <status>0x98</status>
+                <midino>0x43</midino>
+                <options>
+                    <script-binding/>
+                </options>
+            </control>
+            <control>
+                <group>[Channel2]</group>
+                <key>PioneerDDJRX.beatjumpButtons</key>
+                <description>Beatjump -16 Beats Deck 2, Button: PAD5 (in GROUP1-Mode, Deck 2 active)</description>
+                <status>0x98</status>
+                <midino>0x44</midino>
+                <options>
+                    <script-binding/>
+                </options>
+            </control>
+            <control>
+                <group>[Channel2]</group>
+                <key>PioneerDDJRX.beatjumpButtons</key>
+                <description>Beatjump +16 Beats Deck 2, Button: PAD6 (in GROUP1-Mode, Deck 2 active)</description>
+                <status>0x98</status>
+                <midino>0x45</midino>
+                <options>
+                    <script-binding/>
+                </options>
+            </control>
+            <control>
+                <group>[Channel2]</group>
+                <key>PioneerDDJRX.beatjumpButtons</key>
+                <description>Beatjump -32 Beats Deck 2, Button: PAD7 (in GROUP1-Mode, Deck 2 active)</description>
+                <status>0x98</status>
+                <midino>0x46</midino>
+                <options>
+                    <script-binding/>
+                </options>
+            </control>
+            <control>
+                <group>[Channel2]</group>
+                <key>PioneerDDJRX.beatjumpButtons</key>
+                <description>Beatjump +32 Beats Deck 2, Button: PAD8 (in GROUP1-Mode, Deck 2 active)</description>
+                <status>0x98</status>
+                <midino>0x47</midino>
+                <options>
+                    <script-binding/>
+                </options>
+            </control>
+            <control>
+                <group>[Channel2]</group>
                 <key>PioneerDDJRX.toggleHotCueMode</key>
                 <description>Set PAD-Mode, Button: HOT CUE RIGHT (Deck 2 active)</description>
                 <status>0x91</status>
@@ -3140,6 +3390,16 @@
                 <description>Set PAD-Mode, Button: SHIFT ROLL RIGHT (Deck 2 active)</description>
                 <status>0x91</status>
                 <midino>0x6B</midino>
+                <options>
+                    <script-binding/>
+                </options>
+            </control>
+            <control>
+                <group>[Channel2]</group>
+                <key>PioneerDDJRX.toggleBeatJumpMode</key>
+                <description>Set PAD-Mode, Button: SHIFT HOT CUE RIGHT (Deck 2 active)</description>
+                <status>0x91</status>
+                <midino>0x69</midino>
                 <options>
                     <script-binding/>
                 </options>
@@ -3916,6 +4176,46 @@
             </control>
             <control>
                 <group>[Channel3]</group>
+                <key>PioneerDDJRX.parameterRight</key>
+                <description>Double beatjump_size, Button: PARAMETER1 RIGHT (in GROUP1-Mode, Deck 3 active)</description>
+                <status>0x92</status>
+                <midino>0x30</midino>
+                <options>
+                    <script-binding/>
+                </options>
+            </control>
+            <control>
+                <group>[Channel3]</group>
+                <key>PioneerDDJRX.parameterLeft</key>
+                <description>Halve beatjump_size, Button: PARAMETER1 LEFT (in GROUP1-Mode, Deck 3 active)</description>
+                <status>0x92</status>
+                <midino>0x28</midino>
+                <options>
+                    <script-binding/>
+                </options>
+            </control>
+            <control>
+                <group>[Channel3]</group>
+                <key>PioneerDDJRX.shiftParameterRight</key>
+                <description>Double beatjump_size, Button: PARAMETER2 RIGHT (in GROUP1-Mode, Deck 3 active)</description>
+                <status>0x92</status>
+                <midino>0x7D</midino>
+                <options>
+                    <script-binding/>
+                </options>
+            </control>
+            <control>
+                <group>[Channel3]</group>
+                <key>PioneerDDJRX.shiftParameterLeft</key>
+                <description>Halve beatjump_size, Button: PARAMETER2 LEFT (in GROUP1-Mode, Deck 3 active)</description>
+                <status>0x92</status>
+                <midino>0x05</midino>
+                <options>
+                    <script-binding/>
+                </options>
+            </control>
+            <control>
+                <group>[Channel3]</group>
                 <key>PioneerDDJRX.hotCueButtons</key>
                 <description>Hot-Cue 1 Deck 3, Button: PAD1 (in HOT-CUE-Mode, Deck 3 active)</description>
                 <status>0x99</status>
@@ -4556,6 +4856,86 @@
             </control>
             <control>
                 <group>[Channel3]</group>
+                <key>PioneerDDJRX.beatjumpButtons</key>
+                <description>Beatjump -4 Beats Deck 3, Button: PAD1 (in GROUP1-Mode, Deck 3 active)</description>
+                <status>0x99</status>
+                <midino>0x40</midino>
+                <options>
+                    <script-binding/>
+                </options>
+            </control>
+            <control>
+                <group>[Channel3]</group>
+                <key>PioneerDDJRX.beatjumpButtons</key>
+                <description>Beatjump +4 Beats Deck 3, Button: PAD2 (in GROUP1-Mode, Deck 3 active)</description>
+                <status>0x99</status>
+                <midino>0x41</midino>
+                <options>
+                    <script-binding/>
+                </options>
+            </control>
+            <control>
+                <group>[Channel3]</group>
+                <key>PioneerDDJRX.beatjumpButtons</key>
+                <description>Beatjump -8 Beats Deck 3, Button: PAD3 (in GROUP1-Mode, Deck 3 active)</description>
+                <status>0x99</status>
+                <midino>0x42</midino>
+                <options>
+                    <script-binding/>
+                </options>
+            </control>
+            <control>
+                <group>[Channel3]</group>
+                <key>PioneerDDJRX.beatjumpButtons</key>
+                <description>Beatjump +8 Beats Deck 3, Button: PAD4 (in GROUP1-Mode, Deck 3 active)</description>
+                <status>0x99</status>
+                <midino>0x43</midino>
+                <options>
+                    <script-binding/>
+                </options>
+            </control>
+            <control>
+                <group>[Channel3]</group>
+                <key>PioneerDDJRX.beatjumpButtons</key>
+                <description>Beatjump -16 Beats Deck 3, Button: PAD5 (in GROUP1-Mode, Deck 3 active)</description>
+                <status>0x99</status>
+                <midino>0x44</midino>
+                <options>
+                    <script-binding/>
+                </options>
+            </control>
+            <control>
+                <group>[Channel3]</group>
+                <key>PioneerDDJRX.beatjumpButtons</key>
+                <description>Beatjump +16 Beats Deck 3, Button: PAD6 (in GROUP1-Mode, Deck 3 active)</description>
+                <status>0x99</status>
+                <midino>0x45</midino>
+                <options>
+                    <script-binding/>
+                </options>
+            </control>
+            <control>
+                <group>[Channel3]</group>
+                <key>PioneerDDJRX.beatjumpButtons</key>
+                <description>Beatjump -32 Beats Deck 3, Button: PAD7 (in GROUP1-Mode, Deck 3 active)</description>
+                <status>0x99</status>
+                <midino>0x46</midino>
+                <options>
+                    <script-binding/>
+                </options>
+            </control>
+            <control>
+                <group>[Channel3]</group>
+                <key>PioneerDDJRX.beatjumpButtons</key>
+                <description>Beatjump +32 Beats Deck 3, Button: PAD8 (in GROUP1-Mode, Deck 3 active)</description>
+                <status>0x99</status>
+                <midino>0x47</midino>
+                <options>
+                    <script-binding/>
+                </options>
+            </control>
+            <control>
+                <group>[Channel3]</group>
                 <key>PioneerDDJRX.toggleHotCueMode</key>
                 <description>Set PAD-Mode, Button: HOT CUE LEFT (Deck 3 active)</description>
                 <status>0x92</status>
@@ -4610,6 +4990,16 @@
                 <description>Set PAD-Mode, Button: SHIFT ROLL LEFT (Deck 3 active)</description>
                 <status>0x92</status>
                 <midino>0x6B</midino>
+                <options>
+                    <script-binding/>
+                </options>
+            </control>
+            <control>
+                <group>[Channel3]</group>
+                <key>PioneerDDJRX.toggleBeatJumpMode</key>
+                <description>Set PAD-Mode, Button: SHIFT HOT CUE LEFT (Deck 3 active)</description>
+                <status>0x92</status>
+                <midino>0x69</midino>
                 <options>
                     <script-binding/>
                 </options>
@@ -5386,6 +5776,46 @@
             </control>
             <control>
                 <group>[Channel4]</group>
+                <key>PioneerDDJRX.parameterRight</key>
+                <description>Double beatjump_size, Button: PARAMETER1 RIGHT (in GROUP1-Mode, Deck 4 active)</description>
+                <status>0x93</status>
+                <midino>0x30</midino>
+                <options>
+                    <script-binding/>
+                </options>
+            </control>
+            <control>
+                <group>[Channel4]</group>
+                <key>PioneerDDJRX.parameterLeft</key>
+                <description>Halve beatjump_size, Button: PARAMETER1 LEFT (in GROUP1-Mode, Deck 4 active)</description>
+                <status>0x93</status>
+                <midino>0x28</midino>
+                <options>
+                    <script-binding/>
+                </options>
+            </control>
+            <control>
+                <group>[Channel4]</group>
+                <key>PioneerDDJRX.shiftParameterRight</key>
+                <description>Double beatjump_size, Button: PARAMETER2 RIGHT (in GROUP1-Mode, Deck 4 active)</description>
+                <status>0x93</status>
+                <midino>0x7D</midino>
+                <options>
+                    <script-binding/>
+                </options>
+            </control>
+            <control>
+                <group>[Channel4]</group>
+                <key>PioneerDDJRX.shiftParameterLeft</key>
+                <description>Halve beatjump_size, Button: PARAMETER2 LEFT (in GROUP1-Mode, Deck 4 active)</description>
+                <status>0x93</status>
+                <midino>0x05</midino>
+                <options>
+                    <script-binding/>
+                </options>
+            </control>
+            <control>
+                <group>[Channel4]</group>
                 <key>PioneerDDJRX.hotCueButtons</key>
                 <description>Hot-Cue 1 Deck 4, Button: PAD1 (in HOT-CUE-Mode, Deck 4 active)</description>
                 <status>0x9A</status>
@@ -6026,6 +6456,86 @@
             </control>
             <control>
                 <group>[Channel4]</group>
+                <key>PioneerDDJRX.beatjumpButtons</key>
+                <description>Beatjump -4 Beats Deck 4, Button: PAD1 (in GROUP1-Mode, Deck 4 active)</description>
+                <status>0x9A</status>
+                <midino>0x40</midino>
+                <options>
+                    <script-binding/>
+                </options>
+            </control>
+            <control>
+                <group>[Channel4]</group>
+                <key>PioneerDDJRX.beatjumpButtons</key>
+                <description>Beatjump +4 Beats Deck 4, Button: PAD2 (in GROUP1-Mode, Deck 4 active)</description>
+                <status>0x9A</status>
+                <midino>0x41</midino>
+                <options>
+                    <script-binding/>
+                </options>
+            </control>
+            <control>
+                <group>[Channel4]</group>
+                <key>PioneerDDJRX.beatjumpButtons</key>
+                <description>Beatjump -8 Beats Deck 4, Button: PAD3 (in GROUP1-Mode, Deck 4 active)</description>
+                <status>0x9A</status>
+                <midino>0x42</midino>
+                <options>
+                    <script-binding/>
+                </options>
+            </control>
+            <control>
+                <group>[Channel4]</group>
+                <key>PioneerDDJRX.beatjumpButtons</key>
+                <description>Beatjump +8 Beats Deck 4, Button: PAD4 (in GROUP1-Mode, Deck 4 active)</description>
+                <status>0x9A</status>
+                <midino>0x43</midino>
+                <options>
+                    <script-binding/>
+                </options>
+            </control>
+            <control>
+                <group>[Channel4]</group>
+                <key>PioneerDDJRX.beatjumpButtons</key>
+                <description>Beatjump -16 Beats Deck 4, Button: PAD5 (in GROUP1-Mode, Deck 4 active)</description>
+                <status>0x9A</status>
+                <midino>0x44</midino>
+                <options>
+                    <script-binding/>
+                </options>
+            </control>
+            <control>
+                <group>[Channel4]</group>
+                <key>PioneerDDJRX.beatjumpButtons</key>
+                <description>Beatjump +16 Beats Deck 4, Button: PAD6 (in GROUP1-Mode, Deck 4 active)</description>
+                <status>0x9A</status>
+                <midino>0x45</midino>
+                <options>
+                    <script-binding/>
+                </options>
+            </control>
+            <control>
+                <group>[Channel4]</group>
+                <key>PioneerDDJRX.beatjumpButtons</key>
+                <description>Beatjump -32 Beats Deck 4, Button: PAD7 (in GROUP1-Mode, Deck 4 active)</description>
+                <status>0x9A</status>
+                <midino>0x46</midino>
+                <options>
+                    <script-binding/>
+                </options>
+            </control>
+            <control>
+                <group>[Channel4]</group>
+                <key>PioneerDDJRX.beatjumpButtons</key>
+                <description>Beatjump +32 Beats Deck 4, Button: PAD8 (in GROUP1-Mode, Deck 4 active)</description>
+                <status>0x9A</status>
+                <midino>0x47</midino>
+                <options>
+                    <script-binding/>
+                </options>
+            </control>
+            <control>
+                <group>[Channel4]</group>
                 <key>PioneerDDJRX.toggleHotCueMode</key>
                 <description>Set PAD-Mode, Button: HOT CUE RIGHT (Deck 4 active)</description>
                 <status>0x93</status>
@@ -6080,6 +6590,16 @@
                 <description>Set PAD-Mode, Button: SHIFT ROLL RIGHT (Deck 4 active)</description>
                 <status>0x93</status>
                 <midino>0x6B</midino>
+                <options>
+                    <script-binding/>
+                </options>
+            </control>
+            <control>
+                <group>[Channel4]</group>
+                <key>PioneerDDJRX.toggleBeatJumpMode</key>
+                <description>Set PAD-Mode, Button: SHIFT HOT CUE RIGHT (Deck 4 active)</description>
+                <status>0x93</status>
+                <midino>0x69</midino>
                 <options>
                     <script-binding/>
                 </options>

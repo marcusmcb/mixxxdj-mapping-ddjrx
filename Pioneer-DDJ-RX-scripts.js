@@ -137,13 +137,15 @@ PioneerDDJRX.activePadMode = [
 ];
 PioneerDDJRX.samplerVelocityMode = [false, false, false, false];
 
-PioneerDDJRX.hotCueColorMap = new ColorMapper({
-    0x0000CC: 0x7F,
-    0x00CCCC: 0x10,
-    0xCCCC00: 0x20,
-    0xCC00CC: 0x30,
-    0xFFFFFF: 0x40
-});
+// Fixed colors per Hot Cue pad position (Pads 1-8):
+// Pad 1: Pink (0x30), Pad 2: Yellow (0x20), Pad 3: Light Blue (0x05), Pad 4: Green (0x15)
+// Pad 5: Orange (0x27), Pad 6: Dark Blue (0x01), Pad 7: Teal (0x10), Pad 8: White (0x40)
+PioneerDDJRX.padColors = [0x30, 0x20, 0x05, 0x15, 0x27, 0x01, 0x10, 0x40];
+
+// Fixed colors for Beat Jump pads (Pads 1-8):
+// Minus controls (-4, -8, -16, -32): Dark Orange (0x28)
+// Plus controls (+4, +8, +16, +32): Green (0x15)
+PioneerDDJRX.beatjumpPadColors = [0x28, 0x15, 0x28, 0x15, 0x28, 0x15, 0x28, 0x15];
 
 // FX storage:
 PioneerDDJRX.fxKnobMSBValue = [0, 0];
@@ -414,9 +416,8 @@ PioneerDDJRX.init = function(id) {
                     shiftOffset: 0x08,
                     number: hotCueIndex + 1,
                     group: index,
-                    on: 0x7F,
-                    off: 0x00,
-                    colorMapper: PioneerDDJRX.hotCueColorMap
+                    on: PioneerDDJRX.padColors[hotCueIndex],
+                    off: 0x00
                 });
             }
             PioneerDDJRX.initDeck(index);
@@ -731,6 +732,8 @@ PioneerDDJRX.initDeck = function(group) {
     );
     PioneerDDJRX.triggerVinylLed(deck);
 
+    PioneerDDJRX.updateBeatJumpPadLeds(group);
+
     PioneerDDJRX.nonPadLedControl(group, PioneerDDJRX.nonPadLeds.hotCueMode, true); // set HOT CUE Pad-Mode
 };
 
@@ -754,11 +757,13 @@ PioneerDDJRX.resetDeck = function(group) {
         PioneerDDJRX.padLedControl(group, PioneerDDJRX.ledGroups.loopRoll, i, false, false);
         PioneerDDJRX.padLedControl(group, PioneerDDJRX.ledGroups.slicer, i, false, false);
         PioneerDDJRX.padLedControl(group, PioneerDDJRX.ledGroups.sampler, i, false, false);
+        PioneerDDJRX.padLedControl(group, PioneerDDJRX.ledGroups.group1, i, false, false);
         PioneerDDJRX.padLedControl(group, PioneerDDJRX.ledGroups.group2, i, false, false);
         PioneerDDJRX.padLedControl(group, PioneerDDJRX.ledGroups.hotCue, i, true, false);
         PioneerDDJRX.padLedControl(group, PioneerDDJRX.ledGroups.loopRoll, i, true, false);
         PioneerDDJRX.padLedControl(group, PioneerDDJRX.ledGroups.slicer, i, true, false);
         PioneerDDJRX.padLedControl(group, PioneerDDJRX.ledGroups.sampler, i, true, false);
+        PioneerDDJRX.padLedControl(group, PioneerDDJRX.ledGroups.group1, i, true, false);
         PioneerDDJRX.padLedControl(group, PioneerDDJRX.ledGroups.group2, i, true, false);
     }
     // non pad Leds:
@@ -1085,6 +1090,23 @@ PioneerDDJRX.toggleBeatloopMode = function(channel, control, value, status, grou
     }
 };
 
+PioneerDDJRX.updateBeatJumpPadLeds = function(group) {
+    for (var i = 0; i < 8; i++) {
+        PioneerDDJRX.padLedControl(group, PioneerDDJRX.ledGroups.group1, i, false, PioneerDDJRX.beatjumpPadColors[i]);
+    }
+};
+
+PioneerDDJRX.toggleBeatJumpMode = function(channel, control, value, status, group) {
+    var deck = PioneerDDJRX.channelGroups[group];
+    //BEAT JUMP (GROUP1)
+    if (value) {
+        PioneerDDJRX.activePadMode[deck] = PioneerDDJRX.padModes.group1;
+        PioneerDDJRX.activeSlicerMode[deck] = PioneerDDJRX.slicerModes.contSlice;
+        PioneerDDJRX.nonPadLedControl(group, PioneerDDJRX.nonPadLeds.shiftHotCueMode, value);
+        PioneerDDJRX.updateBeatJumpPadLeds(group);
+    }
+};
+
 PioneerDDJRX.hotCueButtons = function(channel, control, value, status, group) {
     var index = control + 1;
     script.toggleControl(group, "hotcue_" + index + "_activate");
@@ -1102,6 +1124,20 @@ PioneerDDJRX.beatloopButtons = function(channel, control, value, status, group) 
         group,
         "beatloop_" + PioneerDDJRX.selectedLoopIntervals[deck][index] + "_toggle"
     );
+};
+
+PioneerDDJRX.beatjumpButtons = function(channel, control, value, status, group) {
+    var index = control - 0x40,
+        beatjumpAmounts = [-4, 4, -8, 8, -16, 16, -32, 32];
+
+    if (index >= 0 && index < beatjumpAmounts.length) {
+        var color = value ? 0x7F : PioneerDDJRX.beatjumpPadColors[index];
+        PioneerDDJRX.padLedControl(group, PioneerDDJRX.ledGroups.group1, index, false, color);
+
+        if (value) {
+            engine.setValue(group, "beatjump", beatjumpAmounts[index]);
+        }
+    }
 };
 
 PioneerDDJRX.slicerButtons = function(channel, control, value, status, group) {
@@ -1210,6 +1246,22 @@ PioneerDDJRX.changeParameters = function(group, ctrl, value) {
     }
     if (ctrl === PioneerDDJRX.nonPadLeds.shiftParameterRightHotCueMode) {
         PioneerDDJRX.nonPadLedControl(group, PioneerDDJRX.nonPadLeds.shiftParameterRightHotCueMode, value);
+        if (value) {
+            beatjumpSize = engine.getValue(group, "beatjump_size");
+            engine.setValue(group, "beatjump_size", beatjumpSize * 2);
+        }
+    }
+
+    //Group1 (Beat Jump) Mode:
+    if (ctrl === PioneerDDJRX.nonPadLeds.parameterLeftGroup1Mode || ctrl === PioneerDDJRX.nonPadLeds.shiftParameterLeftGroup1Mode) {
+        PioneerDDJRX.nonPadLedControl(group, ctrl, value);
+        if (value) {
+            beatjumpSize = engine.getValue(group, "beatjump_size");
+            engine.setValue(group, "beatjump_size", beatjumpSize / 2);
+        }
+    }
+    if (ctrl === PioneerDDJRX.nonPadLeds.parameterRightGroup1Mode || ctrl === PioneerDDJRX.nonPadLeds.shiftParameterRightGroup1Mode) {
+        PioneerDDJRX.nonPadLedControl(group, ctrl, value);
         if (value) {
             beatjumpSize = engine.getValue(group, "beatjump_size");
             engine.setValue(group, "beatjump_size", beatjumpSize * 2);
@@ -1743,7 +1795,7 @@ PioneerDDJRX.padLedControl = function(deck, groupNumber, ledNumber, shift, activ
         midi.sendShortMsg(
             padLedsBaseChannel + midiChannelOffset,
             padLedControl,
-            active ? 0x7F : 0x00
+            typeof active === "number" ? active : (active ? 0x7F : 0x00)
         );
     }
 };

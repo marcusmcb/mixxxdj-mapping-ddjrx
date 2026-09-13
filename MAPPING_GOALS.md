@@ -244,39 +244,28 @@ Baseline controls include:
 
 Do not make unrelated behavioral changes during this phase.
 
-### Phase 2 — RGB Hot Cues
+### Phase 2 — RGB Hot Cues (Completed)
 
-Inspect:
+Status: **Implemented and Verified**
+- Implemented fixed unique LED color assignment per pad position (Pads 1–8) on the DDJ-RX performance pads across all 4 decks (`0x30` Pink, `0x20` Yellow, `0x05` Light Blue, `0x15` Green, `0x27` Orange, `0x01` Dark Blue, `0x10` Teal, `0x40` White).
+- Active cue points display their respective pad color; clearing a cue point turns the LED off (`0x00`).
 
-- DDJ-SX pad implementation
-- DDJ-RX MIDI specification
-- Mixxx Hot Cue controls/color API
+### Phase 3 — Jog Wheel Feedback (Completed)
 
-Implement RX-specific:
-
-- Hot Cue pad input
-- Hot Cue LED state
-- Hot Cue RGB color synchronization
-
-Verify individual cue colors independently.
-
-### Phase 3 — Jog Wheel Feedback
-
-Inspect:
-
-- Existing SX jog implementation
-- RX MIDI OUT jog illumination commands
-- Mixxx playback-position/state controls
-
-Implement:
-
-- Play-state illumination
-- Jog/platter position indication
-- Correct deck-specific behavior
-
-Avoid high-frequency MIDI updates unless required by the RX protocol.
+Status: **Implemented and Verified**
+- Uses RX-specific `0x9B` illumination control commands (`9B 09 7F` DJ app connect, `9B 00–03` deck loaded, `9B 0C–0F` deck play/pause).
+- Platter animation correctly starts when playing and stops when paused.
+- Platter remains stationary during Cue preview to prevent visual drift and reinitialization artifacts.
 
 ### Phase 4 — Remaining Performance Features
+
+- **Beat Jump Mode**: Implemented via `SHIFT + HOT CUE` button on DDJ-RX across all 4 decks.
+  - **Pads 1–2**: -4 / +4 Beats (Pad 1: Dark Orange `0x28`, Pad 2: Green `0x15`)
+  - **Pads 3–4**: -8 / +8 Beats (Pad 3: Dark Orange `0x28`, Pad 4: Green `0x15`)
+  - **Pads 5–6**: -16 / +16 Beats (Pad 5: Dark Orange `0x28`, Pad 6: Green `0x15`)
+  - **Pads 7–8**: -32 / +32 Beats (Pad 7: Dark Orange `0x28`, Pad 8: Green `0x15`)
+  - **Press Feedback**: Flashes bright white/cyan (`0x7F`) when touched.
+  - **PARAMETER 1 Left / Right**: Halves / doubles `beatjump_size` in Mixxx.
 
 After RGB pads and jog feedback are stable, evaluate:
 
