@@ -114,9 +114,9 @@ PioneerDDJRX.needleSearchTouched = [false, false, false, false];
 PioneerDDJRX.chFaderStart = [null, null, null, null];
 PioneerDDJRX.toggledBrake = [false, false, false, false];
 PioneerDDJRX.scratchMode = [true, true, true, true];
-PioneerDDJRX.wheelLedsBlinkStatus = [0, 0, 0, 0];
-PioneerDDJRX.wheelLedsPosition = [0, 0, 0, 0];
 PioneerDDJRX.setUpSpeedSliderRange = [0.08, 0.08, 0.08, 0.08];
+PioneerDDJRX.platterLoaded = [false, false, false, false];
+PioneerDDJRX.platterMoving = [null, null, null, null];
 
 // PAD mode storage:
 PioneerDDJRX.padModes = {
@@ -369,24 +369,11 @@ PioneerDDJRX.init = function(id) {
         'loadedDeck2': 0x01,
         'loadedDeck3': 0x02,
         'loadedDeck4': 0x03,
-        'unknownDeck1': 0x04,
-        'unknownDeck2': 0x05,
-        'unknownDeck3': 0x06,
-        'unknownDeck4': 0x07,
         'playPauseDeck1': 0x0C,
         'playPauseDeck2': 0x0D,
         'playPauseDeck3': 0x0E,
         'playPauseDeck4': 0x0F,
-        'cueDeck1': 0x10,
-        'cueDeck2': 0x11,
-        'cueDeck3': 0x12,
-        'cueDeck4': 0x13,
         'djAppConnect': 0x09
-    };
-
-    PioneerDDJRX.wheelLedCircle = {
-        'minVal': 0x00,
-        'maxVal': 0x48
     };
 
     PioneerDDJRX.valueVuMeter = {
@@ -411,7 +398,7 @@ PioneerDDJRX.init = function(id) {
     }
 
     // initiate control status request:
-    midi.sendShortMsg(0x9B, 0x08, 0x7F);
+    midi.sendShortMsg(0x9B, PioneerDDJRX.illuminationControl.djAppConnect, 0x7F);
 
     // bind controls and init deck parameters:
     PioneerDDJRX.bindNonDeckControlConnections(true);
@@ -647,8 +634,8 @@ PioneerDDJRX.bindDeckControlConnections = function(channelGroup, bind) {
         deck = PioneerDDJRX.channelGroups[channelGroup],
         controlsToFunctions = {
             'play_indicator': 'PioneerDDJRX.playLed',
+            'play': 'PioneerDDJRX.jogPlayState',
             'cue_indicator': 'PioneerDDJRX.cueLed',
-            'playposition': 'PioneerDDJRX.wheelLeds',
             'pfl': 'PioneerDDJRX.headphoneCueLed',
             'bpm_tap': 'PioneerDDJRX.shiftHeadphoneCueLed',
             'VuMeter': 'PioneerDDJRX.VuMeterLeds',
@@ -726,6 +713,9 @@ PioneerDDJRX.bindNonDeckControlConnections = function(bind) {
 PioneerDDJRX.initDeck = function(group) {
     var deck = PioneerDDJRX.channelGroups[group];
 
+    PioneerDDJRX.platterLoaded[deck] = false;
+    PioneerDDJRX.platterMoving[deck] = null;
+
     // save set up speed slider range from the Mixxx settings:
     PioneerDDJRX.setUpSpeedSliderRange[deck] = engine.getValue(group, "rateRange");
 
@@ -741,15 +731,6 @@ PioneerDDJRX.initDeck = function(group) {
     );
     PioneerDDJRX.triggerVinylLed(deck);
 
-    PioneerDDJRX.illuminateFunctionControl(
-        PioneerDDJRX.illuminationControl["loadedDeck" + (deck + 1)],
-        false
-    );
-    PioneerDDJRX.illuminateFunctionControl(
-        PioneerDDJRX.illuminationControl["unknownDeck" + (deck + 1)],
-        false
-    );
-    PioneerDDJRX.wheelLedControl(group, PioneerDDJRX.wheelLedCircle.minVal);
     PioneerDDJRX.nonPadLedControl(group, PioneerDDJRX.nonPadLeds.hotCueMode, true); // set HOT CUE Pad-Mode
 };
 
@@ -757,7 +738,15 @@ PioneerDDJRX.resetDeck = function(group) {
     PioneerDDJRX.bindDeckControlConnections(group, false);
 
     PioneerDDJRX.VuMeterLeds(0x00, group, 0x00); // reset VU meter Leds
-    PioneerDDJRX.wheelLedControl(group, PioneerDDJRX.wheelLedCircle.minVal); // reset jogwheel Leds
+    var deck = PioneerDDJRX.channelGroups[group];
+    if (PioneerDDJRX.platterLoaded[deck]) {
+        PioneerDDJRX.illuminateFunctionControl(
+            PioneerDDJRX.illuminationControl["playPauseDeck" + (deck + 1)],
+            false
+        );
+    }
+    PioneerDDJRX.platterLoaded[deck] = false;
+    PioneerDDJRX.platterMoving[deck] = false;
     PioneerDDJRX.nonPadLedControl(group, PioneerDDJRX.nonPadLeds.hotCueMode, true); // reset HOT CUE Pad-Mode
     // pad Leds:
     for (var i = 0; i < 8; i++) {
@@ -1782,16 +1771,20 @@ PioneerDDJRX.illuminateFunctionControl = function(ledNumber, active) {
     );
 };
 
-PioneerDDJRX.wheelLedControl = function(deck, ledNumber) {
-    var wheelLedBaseChannel = 0xBB,
-        channel = PioneerDDJRX.deckConverter(deck);
+PioneerDDJRX.syncPlatterMotion = function(group, force) {
+    var deck = PioneerDDJRX.channelGroups[group];
 
-    if (channel !== null) {
-        midi.sendShortMsg(
-            wheelLedBaseChannel,
-            channel,
-            ledNumber
+    if (!PioneerDDJRX.platterLoaded[deck]) {
+        return;
+    }
+
+    var moving = engine.getValue(group, "play") > 0;
+    if (force || PioneerDDJRX.platterMoving[deck] !== moving) {
+        PioneerDDJRX.illuminateFunctionControl(
+            PioneerDDJRX.illuminationControl["playPauseDeck" + (deck + 1)],
+            moving
         );
+        PioneerDDJRX.platterMoving[deck] = moving;
     }
 };
 
@@ -1849,41 +1842,8 @@ PioneerDDJRX.playLed = function(value, group, control) {
     PioneerDDJRX.nonPadLedControl(group, PioneerDDJRX.nonPadLeds.shiftPlay, value);
 };
 
-PioneerDDJRX.wheelLeds = function(value, group, control) {
-    // Timing calculation is handled in seconds!
-    var deck = PioneerDDJRX.channelGroups[group],
-        duration = engine.getValue(group, "duration"),
-        elapsedTime = value * duration,
-        remainingTime = duration - elapsedTime,
-        revolutionsPerSecond = PioneerDDJRX.scratchSettings.vinylSpeed / 60,
-        speed = parseInt(revolutionsPerSecond * PioneerDDJRX.wheelLedCircle.maxVal),
-        wheelPos = PioneerDDJRX.wheelLedCircle.minVal;
-
-    if (value >= 0) {
-        wheelPos = PioneerDDJRX.wheelLedCircle.minVal + 0x01 + ((speed * elapsedTime) % PioneerDDJRX.wheelLedCircle.maxVal);
-    } else {
-        wheelPos = PioneerDDJRX.wheelLedCircle.maxVal + 0x01 + ((speed * elapsedTime) % PioneerDDJRX.wheelLedCircle.maxVal);
-    }
-    // let wheel LEDs blink if remaining time is less than 30s:
-    if (remainingTime > 0 && remainingTime < 30 && !engine.isScratching(deck + 1)) {
-        var blinkInterval = parseInt(remainingTime / 3); //increase blinking according time left
-        if (blinkInterval < 3) {
-            blinkInterval = 3;
-        }
-        if (PioneerDDJRX.wheelLedsBlinkStatus[deck] < blinkInterval) {
-            wheelPos = PioneerDDJRX.wheelLedCircle.minVal;
-        } else if (PioneerDDJRX.wheelLedsBlinkStatus[deck] > (blinkInterval - parseInt(6 / blinkInterval))) {
-            PioneerDDJRX.wheelLedsBlinkStatus[deck] = 0;
-        }
-        PioneerDDJRX.wheelLedsBlinkStatus[deck]++;
-    }
-    wheelPos = parseInt(wheelPos);
-    // Only send midi message when the position is actually updated.
-    // Otherwise, the amount of messages may exceed the maximum rate at high position update rates.
-    if (PioneerDDJRX.wheelLedsPosition[deck] !== wheelPos) {
-      PioneerDDJRX.wheelLedControl(group, wheelPos);
-    }
-    PioneerDDJRX.wheelLedsPosition[deck] = wheelPos;
+PioneerDDJRX.jogPlayState = function(value, group, control) {
+    PioneerDDJRX.syncPlatterMotion(group, false);
 };
 
 PioneerDDJRX.cueLed = function(value, group, control) {
@@ -1894,12 +1854,26 @@ PioneerDDJRX.cueLed = function(value, group, control) {
 PioneerDDJRX.loadLed = function(value, group, control) {
     var deck = PioneerDDJRX.channelGroups[group];
     if (value > 0) {
-        PioneerDDJRX.wheelLedControl(group, PioneerDDJRX.wheelLedCircle.maxVal);
         PioneerDDJRX.generalLedControl(PioneerDDJRX.nonPadLeds["loadDeck" + (deck + 1)], true);
-        PioneerDDJRX.illuminateFunctionControl(PioneerDDJRX.illuminationControl["loadedDeck" + (deck + 1)], true);
-        engine.trigger(group, "playposition");
+        if (!PioneerDDJRX.platterLoaded[deck]) {
+            PioneerDDJRX.illuminateFunctionControl(
+                PioneerDDJRX.illuminationControl["loadedDeck" + (deck + 1)],
+                true
+            );
+            PioneerDDJRX.platterLoaded[deck] = true;
+            PioneerDDJRX.platterMoving[deck] = null;
+            PioneerDDJRX.syncPlatterMotion(group, true);
+        }
     } else {
-        PioneerDDJRX.wheelLedControl(group, PioneerDDJRX.wheelLedCircle.minVal);
+        PioneerDDJRX.generalLedControl(PioneerDDJRX.nonPadLeds["loadDeck" + (deck + 1)], false);
+        if (PioneerDDJRX.platterLoaded[deck]) {
+            PioneerDDJRX.illuminateFunctionControl(
+                PioneerDDJRX.illuminationControl["playPauseDeck" + (deck + 1)],
+                false
+            );
+        }
+        PioneerDDJRX.platterLoaded[deck] = false;
+        PioneerDDJRX.platterMoving[deck] = false;
     }
 };
 
