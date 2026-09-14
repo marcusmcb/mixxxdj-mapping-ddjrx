@@ -266,6 +266,11 @@ Status: **Implemented and Verified**
   - **Pads 7–8**: -32 / +32 Beats (Pad 7: Dark Orange `0x28`, Pad 8: Green `0x15`)
   - **Press Feedback**: Flashes bright white/cyan (`0x7F`) when touched.
   - **PARAMETER 1 Left / Right**: Halves / doubles `beatjump_size` in Mixxx.
+- **Sampler Mode Illumination**:
+  - **Sample Loaded & Stopped**: Solid Pink (`0x30`).
+  - **Sample Playing**: Blinks in Green (`0x15` / `0x00`) at 250ms interval while playing.
+  - **Sample Finished / Stopped**: Immediately returns to solid Pink (`0x30`).
+  - **Empty Slot**: Off (`0x00`).
 
 After RGB pads and jog feedback are stable, evaluate:
 

@@ -147,6 +147,10 @@ PioneerDDJRX.padColors = [0x30, 0x20, 0x05, 0x15, 0x27, 0x01, 0x10, 0x40];
 // Plus controls (+4, +8, +16, +32): Green (0x15)
 PioneerDDJRX.beatjumpPadColors = [0x28, 0x15, 0x28, 0x15, 0x28, 0x15, 0x28, 0x15];
 
+// Sampler blink timers and state tracking (Pads 1-8):
+PioneerDDJRX.samplerBlinkTimers = [0, 0, 0, 0, 0, 0, 0, 0];
+PioneerDDJRX.samplerBlinkState = [false, false, false, false, false, false, false, false];
+
 // FX storage:
 PioneerDDJRX.fxKnobMSBValue = [0, 0];
 PioneerDDJRX.shiftFxKnobMSBValue = [0, 0];
@@ -447,6 +451,13 @@ PioneerDDJRX.init = function(id) {
 };
 
 PioneerDDJRX.shutdown = function() {
+    for (var i = 0; i < 8; i++) {
+        if (PioneerDDJRX.samplerBlinkTimers[i]) {
+            engine.stopTimer(PioneerDDJRX.samplerBlinkTimers[i]);
+            PioneerDDJRX.samplerBlinkTimers[i] = 0;
+        }
+    }
+
     for (var group in PioneerDDJRX.hotCueComponents) {
         if (PioneerDDJRX.hotCueComponents.hasOwnProperty(group)) {
             for (var hotCueIndex = 0; hotCueIndex < PioneerDDJRX.hotCueComponents[group].length; hotCueIndex++) {
@@ -1061,6 +1072,9 @@ PioneerDDJRX.toggleSamplerMode = function(channel, control, value, status, group
         PioneerDDJRX.activePadMode[deck] = PioneerDDJRX.padModes.sampler;
         PioneerDDJRX.activeSlicerMode[deck] = PioneerDDJRX.slicerModes.contSlice;
         PioneerDDJRX.nonPadLedControl(group, PioneerDDJRX.nonPadLeds.samplerMode, value);
+        for (var i = 0; i < 8; i++) {
+            PioneerDDJRX.updateSamplerPadLed(i);
+        }
     }
 };
 
@@ -2007,50 +2021,73 @@ PioneerDDJRX.hotCueParameterLeftLed = function(value, group, control) {
     PioneerDDJRX.nonPadLedControl(group, PioneerDDJRX.nonPadLeds.parameterLeftHotCueMode, value);
 };
 
-PioneerDDJRX.samplerLeds = function(value, group, control) {
-    var samplerIndex = (group.replace("[Sampler", '').replace(']', '') - 1) % 8,
-        sampleDeck = "[Sampler" + (samplerIndex + 1) + "]",
-        padNum = PioneerDDJRX.samplerGroups[sampleDeck];
+PioneerDDJRX.updateSamplerPadLed = function(padNum) {
+    var samplerIndex = padNum + 1 + (PioneerDDJRX.selectedSamplerBank * 8),
+        sampleDeck = "[Sampler" + samplerIndex + "]",
+        duration = engine.getValue(sampleDeck, "duration"),
+        playing = engine.getValue(sampleDeck, "play") > 0;
 
-    for (var index in PioneerDDJRX.channelGroups) {
-        if (PioneerDDJRX.channelGroups.hasOwnProperty(index)) {
-            PioneerDDJRX.padLedControl(
-                PioneerDDJRX.channelGroups[index],
-                PioneerDDJRX.ledGroups.sampler,
-                padNum,
-                false,
-                value
-            );
+    if (duration > 0 && playing) {
+        if (!PioneerDDJRX.samplerBlinkTimers[padNum]) {
+            PioneerDDJRX.samplerBlinkState[padNum] = true;
+            PioneerDDJRX.samplerBlinkTimers[padNum] = engine.beginTimer(250, function() {
+                PioneerDDJRX.samplerBlinkState[padNum] = !PioneerDDJRX.samplerBlinkState[padNum];
+                var color = PioneerDDJRX.samplerBlinkState[padNum] ? 0x15 : 0x00;
+                for (var idx in PioneerDDJRX.channelGroups) {
+                    if (PioneerDDJRX.channelGroups.hasOwnProperty(idx)) {
+                        PioneerDDJRX.padLedControl(
+                            PioneerDDJRX.channelGroups[idx],
+                            PioneerDDJRX.ledGroups.sampler,
+                            padNum,
+                            false,
+                            color
+                        );
+                    }
+                }
+            });
+        }
+        var initialColor = PioneerDDJRX.samplerBlinkState[padNum] ? 0x15 : 0x00;
+        for (var idx in PioneerDDJRX.channelGroups) {
+            if (PioneerDDJRX.channelGroups.hasOwnProperty(idx)) {
+                PioneerDDJRX.padLedControl(
+                    PioneerDDJRX.channelGroups[idx],
+                    PioneerDDJRX.ledGroups.sampler,
+                    padNum,
+                    false,
+                    initialColor
+                );
+            }
+        }
+    } else {
+        if (PioneerDDJRX.samplerBlinkTimers[padNum]) {
+            engine.stopTimer(PioneerDDJRX.samplerBlinkTimers[padNum]);
+            PioneerDDJRX.samplerBlinkTimers[padNum] = 0;
+        }
+        PioneerDDJRX.samplerBlinkState[padNum] = false;
+
+        var solidColor = (duration > 0) ? 0x30 : 0x00;
+        for (var idx2 in PioneerDDJRX.channelGroups) {
+            if (PioneerDDJRX.channelGroups.hasOwnProperty(idx2)) {
+                PioneerDDJRX.padLedControl(
+                    PioneerDDJRX.channelGroups[idx2],
+                    PioneerDDJRX.ledGroups.sampler,
+                    padNum,
+                    false,
+                    solidColor
+                );
+            }
         }
     }
 };
 
+PioneerDDJRX.samplerLeds = function(value, group, control) {
+    var samplerIndex = (group.replace("[Sampler", '').replace(']', '') - 1) % 8;
+    PioneerDDJRX.updateSamplerPadLed(samplerIndex);
+};
+
 PioneerDDJRX.samplerLedsPlay = function(value, group, control) {
-    var samplerIndex = (group.replace("[Sampler", '').replace(']', '') - 1) % 8,
-        sampleDeck = "[Sampler" + (samplerIndex + 1) + "]",
-        padNum = PioneerDDJRX.samplerGroups[sampleDeck];
-
-    if (!engine.getValue(sampleDeck, "duration")) {
-        return;
-    }
-
-    for (var index in PioneerDDJRX.channelGroups) {
-        if (PioneerDDJRX.channelGroups.hasOwnProperty(index)) {
-            PioneerDDJRX.padLedControl(
-                PioneerDDJRX.channelGroups[index],
-                PioneerDDJRX.ledGroups.sampler,
-                padNum,
-                false, !value
-            );
-            PioneerDDJRX.padLedControl(
-                PioneerDDJRX.channelGroups[index],
-                PioneerDDJRX.ledGroups.sampler,
-                padNum,
-                true,
-                value
-            );
-        }
-    }
+    var samplerIndex = (group.replace("[Sampler", '').replace(']', '') - 1) % 8;
+    PioneerDDJRX.updateSamplerPadLed(samplerIndex);
 };
 
 PioneerDDJRX.beatloopLeds = function(value, group, control) {
