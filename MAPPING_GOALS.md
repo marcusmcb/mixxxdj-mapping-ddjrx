@@ -271,6 +271,16 @@ Status: **Implemented and Verified**
   - **Sample Playing**: Blinks in Green (`0x15` / `0x00`) at 250ms interval while playing.
   - **Sample Finished / Stopped**: Immediately returns to solid Pink (`0x30`).
   - **Empty Slot**: Off (`0x00`).
+- **Auto Beat Loop Illumination**:
+  - **Loop Active (`loop_enabled = 1`)**: `AUTO BEAT LOOP`, `BEAT 1/2X`, and `BEAT 2X` button LEDs all illuminate ON.
+  - **Loop Exit (`loop_enabled = 0`)**: All three LEDs extinguish OFF.
+- **Turntable Vinyl Brake on Pause**:
+  - Tapping PLAY/PAUSE on a playing track triggers a turntable spin-down using Mixxx's `engine.brake()`.
+  - Tapping PLAY/PAUSE while spinning down instantly resumes normal playback.
+  - Configurable options: `PioneerDDJRX.vinylBrakeEnabled` (default: `true`) and `PioneerDDJRX.vinylBrakeFactor` (default: `40.0`).
+- **Sound Color FX Quick Effects**:
+  - `FILTER` selects Moog Filter, `CRUSH` selects Bitcrusher, `NOISE` selects Filter Echo, and `PITCH` selects Echo for Channels 1 and 2 together.
+  - `loaded_chain_preset` uses one-based indexes from Mixxx's Quick Effect preset list.
 
 After RGB pads and jog feedback are stable, evaluate:
 

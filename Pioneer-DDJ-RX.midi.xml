@@ -76,6 +76,46 @@
             </control>
             <control>
                 <group>[Master]</group>
+                <key>PioneerDDJRX.soundColorFxButton</key>
+                <description>Select Filter Echo Quick Effect for Channels 1 and 2, Button: NOISE</description>
+                <status>0x96</status>
+                <midino>0x10</midino>
+                <options>
+                    <script-binding/>
+                </options>
+            </control>
+            <control>
+                <group>[Master]</group>
+                <key>PioneerDDJRX.soundColorFxButton</key>
+                <description>Select Bitcrusher Quick Effect for Channels 1 and 2, Button: CRUSH</description>
+                <status>0x96</status>
+                <midino>0x11</midino>
+                <options>
+                    <script-binding/>
+                </options>
+            </control>
+            <control>
+                <group>[Master]</group>
+                <key>PioneerDDJRX.soundColorFxButton</key>
+                <description>Select Echo Quick Effect for Channels 1 and 2, Button: PITCH</description>
+                <status>0x96</status>
+                <midino>0x12</midino>
+                <options>
+                    <script-binding/>
+                </options>
+            </control>
+            <control>
+                <group>[Master]</group>
+                <key>PioneerDDJRX.soundColorFxButton</key>
+                <description>Select Moog Filter Quick Effect for Channels 1 and 2, Button: FILTER</description>
+                <status>0x96</status>
+                <midino>0x13</midino>
+                <options>
+                    <script-binding/>
+                </options>
+            </control>
+            <control>
+                <group>[Master]</group>
                 <key>PioneerDDJRX.shiftBackButton</key>
                 <description>Toggle maximized view of Library, Button: SHIFT &amp; BACK</description>
                 <status>0x96</status>

@@ -97,6 +97,20 @@ PioneerDDJRX.samplerCueGotoAndPlay = false;
 // If true, PFL / Cue (headphone) is being activated by loading a track into certain deck (default: true).
 PioneerDDJRX.autoPFL = true;
 
+// Enable turntable vinyl brake effect when pausing a playing track (default: true).
+PioneerDDJRX.vinylBrakeEnabled = true;
+// Sets vinyl brake speed/duration factor (default: 40.0).
+// Lower values (e.g. 8.0 or 20.0) brake more slowly; higher values (e.g. 40.0) produce an ultra-short, abrupt stop.
+PioneerDDJRX.vinylBrakeFactor = 40.0;
+
+// One-based indexes from this Mixxx installation's QuickEffectPresetList.
+PioneerDDJRX.soundColorFx = {
+    0x10: { name: "Filter Echo", preset: 2 },
+    0x11: { name: "Bitcrusher", preset: 8 },
+    0x12: { name: "Echo", preset: 10 },
+    0x13: { name: "Moog Filter", preset: 14 }
+};
+
 
 ///////////////////////////////////////////////////////////////
 //               INIT, SHUTDOWN & GLOBAL HELPER              //
@@ -112,11 +126,12 @@ PioneerDDJRX.gridAdjustSelected = [false, false, false, false];
 PioneerDDJRX.gridSlideSelected = [false, false, false, false];
 PioneerDDJRX.needleSearchTouched = [false, false, false, false];
 PioneerDDJRX.chFaderStart = [null, null, null, null];
-PioneerDDJRX.toggledBrake = [false, false, false, false];
+PioneerDDJRX.isBraking = [false, false, false, false];
 PioneerDDJRX.scratchMode = [true, true, true, true];
 PioneerDDJRX.setUpSpeedSliderRange = [0.08, 0.08, 0.08, 0.08];
 PioneerDDJRX.platterLoaded = [false, false, false, false];
 PioneerDDJRX.platterMoving = [null, null, null, null];
+PioneerDDJRX.activeSoundColorFx = null;
 
 // PAD mode storage:
 PioneerDDJRX.padModes = {
@@ -405,6 +420,7 @@ PioneerDDJRX.init = function(id) {
 
     // initiate control status request:
     midi.sendShortMsg(0x9B, PioneerDDJRX.illuminationControl.djAppConnect, 0x7F);
+    PioneerDDJRX.updateSoundColorFxLeds();
 
     // bind controls and init deck parameters:
     PioneerDDJRX.bindNonDeckControlConnections(true);
@@ -725,6 +741,7 @@ PioneerDDJRX.bindNonDeckControlConnections = function(bind) {
 PioneerDDJRX.initDeck = function(group) {
     var deck = PioneerDDJRX.channelGroups[group];
 
+    PioneerDDJRX.isBraking[deck] = false;
     PioneerDDJRX.platterLoaded[deck] = false;
     PioneerDDJRX.platterMoving[deck] = null;
 
@@ -761,6 +778,7 @@ PioneerDDJRX.resetDeck = function(group) {
     }
     PioneerDDJRX.platterLoaded[deck] = false;
     PioneerDDJRX.platterMoving[deck] = false;
+    PioneerDDJRX.isBraking[deck] = false;
     PioneerDDJRX.nonPadLedControl(group, PioneerDDJRX.nonPadLeds.hotCueMode, true); // reset HOT CUE Pad-Mode
     // pad Leds:
     for (var i = 0; i < 8; i++) {
@@ -978,22 +996,44 @@ PioneerDDJRX.shiftButton = function(channel, control, value, status, group) {
     }
 };
 
+PioneerDDJRX.soundColorFxButton = function(channel, control, value, status, group) {
+    if (!value || PioneerDDJRX.soundColorFx[control] === undefined) {
+        return;
+    }
+
+    var effect = PioneerDDJRX.soundColorFx[control],
+        channels = ["[Channel1]", "[Channel2]"];
+
+    for (var index = 0; index < channels.length; index++) {
+        engine.setValue(
+            "[QuickEffectRack1_" + channels[index] + "]",
+            "loaded_chain_preset",
+            effect.preset
+        );
+    }
+
+    PioneerDDJRX.activeSoundColorFx = control;
+    PioneerDDJRX.updateSoundColorFxLeds();
+};
+
 PioneerDDJRX.playButton = function(channel, control, value, status, group) {
     var deck = PioneerDDJRX.channelGroups[group],
-        playing = engine.getValue(group, "play");
+        deckNum = deck + 1,
+        playing = engine.getValue(group, "play") > 0;
 
     if (value) {
-        if (playing) {
-            script.brake(channel, control, value, status, group);
-            PioneerDDJRX.toggledBrake[deck] = true;
+        if (PioneerDDJRX.vinylBrakeEnabled) {
+            if (playing && !PioneerDDJRX.isBraking[deck]) {
+                PioneerDDJRX.isBraking[deck] = true;
+                engine.brake(deckNum, true, PioneerDDJRX.vinylBrakeFactor);
+            } else if (PioneerDDJRX.isBraking[deck]) {
+                engine.brake(deckNum, false);
+                PioneerDDJRX.isBraking[deck] = false;
+            } else {
+                engine.setValue(group, "play", 1);
+            }
         } else {
             script.toggleControl(group, "play");
-        }
-    } else {
-        if (PioneerDDJRX.toggledBrake[deck]) {
-            script.brake(channel, control, value, status, group);
-            script.toggleControl(group, "play");
-            PioneerDDJRX.toggledBrake[deck] = false;
         }
     }
 };
@@ -1763,6 +1803,8 @@ PioneerDDJRX.resetNonDeckLeds = function() {
     PioneerDDJRX.generalLedControl(PioneerDDJRX.nonPadLeds.shiftLoadDeck3, false);
     PioneerDDJRX.generalLedControl(PioneerDDJRX.nonPadLeds.loadDeck4, false);
     PioneerDDJRX.generalLedControl(PioneerDDJRX.nonPadLeds.shiftLoadDeck4, false);
+    PioneerDDJRX.activeSoundColorFx = null;
+    PioneerDDJRX.updateSoundColorFxLeds();
 };
 
 PioneerDDJRX.fxAssignLedControl = function(unit, ledNumber, active) {
@@ -1864,6 +1906,17 @@ PioneerDDJRX.generalLedControl = function(ledNumber, active) {
     );
 };
 
+PioneerDDJRX.updateSoundColorFxLeds = function() {
+    for (var control in PioneerDDJRX.soundColorFx) {
+        if (PioneerDDJRX.soundColorFx.hasOwnProperty(control)) {
+            PioneerDDJRX.generalLedControl(
+                Number(control),
+                Number(control) === PioneerDDJRX.activeSoundColorFx
+            );
+        }
+    }
+};
+
 PioneerDDJRX.updateParameterStatusLeds = function(group, statusRoll, statusLoop, statusSampler, statusSlicerQuant, statusSlicerDomain) {
     PioneerDDJRX.nonPadLedControl(group, PioneerDDJRX.nonPadLeds.parameterLeftRollMode, statusRoll & (1 << 1));
     PioneerDDJRX.nonPadLedControl(group, PioneerDDJRX.nonPadLeds.parameterRightRollMode, statusRoll & 1);
@@ -1909,6 +1962,11 @@ PioneerDDJRX.playLed = function(value, group, control) {
 };
 
 PioneerDDJRX.jogPlayState = function(value, group, control) {
+    var deck = PioneerDDJRX.channelGroups[group];
+    if (!value && PioneerDDJRX.isBraking[deck]) {
+        PioneerDDJRX.isBraking[deck] = false;
+        engine.brake(deck + 1, false);
+    }
     PioneerDDJRX.syncPlatterMotion(group, false);
 };
 
@@ -1981,6 +2039,8 @@ PioneerDDJRX.syncLed = function(value, group, control) {
 
 PioneerDDJRX.autoLoopLed = function(value, group, control) {
     PioneerDDJRX.nonPadLedControl(group, PioneerDDJRX.nonPadLeds.autoLoop, value);
+    PioneerDDJRX.nonPadLedControl(group, PioneerDDJRX.nonPadLeds.loopHalve, value);
+    PioneerDDJRX.nonPadLedControl(group, PioneerDDJRX.nonPadLeds.loopDouble, value);
     PioneerDDJRX.nonPadLedControl(group, PioneerDDJRX.nonPadLeds.shiftLoopOut, value);
     PioneerDDJRX.nonPadLedControl(group, PioneerDDJRX.nonPadLeds.shiftAutoLoop, value);
 };
@@ -1998,11 +2058,13 @@ PioneerDDJRX.loopOutLed = function(value, group, control) {
 };
 
 PioneerDDJRX.loopHalveLed = function(value, group, control) {
-    PioneerDDJRX.nonPadLedControl(group, PioneerDDJRX.nonPadLeds.loopHalve, value);
+    var isLoopActive = engine.getValue(group, "loop_enabled") > 0;
+    PioneerDDJRX.nonPadLedControl(group, PioneerDDJRX.nonPadLeds.loopHalve, value || isLoopActive);
 };
 
 PioneerDDJRX.loopDoubleLed = function(value, group, control) {
-    PioneerDDJRX.nonPadLedControl(group, PioneerDDJRX.nonPadLeds.loopDouble, value);
+    var isLoopActive = engine.getValue(group, "loop_enabled") > 0;
+    PioneerDDJRX.nonPadLedControl(group, PioneerDDJRX.nonPadLeds.loopDouble, value || isLoopActive);
 };
 
 PioneerDDJRX.loopShiftFWLed = function(value, group, control) {

@@ -2802,7 +2802,7 @@ PioneerDDJSX.syncLed = function (value, group, control) {
       );
       PioneerDDJSX.nonPadLedControl(
         group,
-        PioneerDDJSX.nonPadLeds.takeoverPlus,
+         PioneerDDJSX.nonPadLeds.takeoverPlus,
         1,
       );
     }
