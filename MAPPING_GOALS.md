@@ -283,6 +283,8 @@ Status: **Implemented and Verified**
   - `loaded_chain_preset` uses one-based indexes from Mixxx's Quick Effect preset list.
 - **Pitch Arrow LEDs**:
   - Tempo fader arrow LEDs indicate Mixxx `rate` direction per deck: one arrow for positive rate, the other for negative rate, and both off near center.
+- **Beat Grid Adjustment**:
+  - Holding `GRID ADJUST` and moving the platter shifts the beat grid earlier/later instead of changing detected BPM.
 
 After RGB pads and jog feedback are stable, evaluate:
 

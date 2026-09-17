@@ -2251,10 +2251,10 @@ PioneerDDJRX.jogPlatterTick = function(channel, control, value, status, group) {
 
     if (PioneerDDJRX.gridAdjustSelected[deck]) {
         if (PioneerDDJRX.getJogWheelDelta(value) > 0) {
-            script.toggleControl(group, "beats_adjust_faster");
+            script.toggleControl(group, "beats_translate_later");
         }
         if (PioneerDDJRX.getJogWheelDelta(value) <= 0) {
-            script.toggleControl(group, "beats_adjust_slower");
+            script.toggleControl(group, "beats_translate_earlier");
         }
         return;
     }
