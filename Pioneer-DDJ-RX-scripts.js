@@ -761,6 +761,7 @@ PioneerDDJRX.initDeck = function(group) {
     PioneerDDJRX.triggerVinylLed(deck);
 
     PioneerDDJRX.updateBeatJumpPadLeds(group);
+    PioneerDDJRX.updateTempoArrowLeds(group);
 
     PioneerDDJRX.nonPadLedControl(group, PioneerDDJRX.nonPadLeds.hotCueMode, true); // set HOT CUE Pad-Mode
 };
@@ -861,11 +862,10 @@ PioneerDDJRX.tempoSliderLSB = function(channel, control, value, status, group) {
         deck = PioneerDDJRX.channelGroups[group];
 
     engine.setParameter(group, "rate", sliderRate);
+    PioneerDDJRX.updateTempoArrowLeds(group);
 
     if (PioneerDDJRX.syncRate[deck] !== 0) {
         if (PioneerDDJRX.syncRate[deck] !== engine.getValue(group, "rate")) {
-            PioneerDDJRX.nonPadLedControl(group, PioneerDDJRX.nonPadLeds.takeoverPlus, 0);
-            PioneerDDJRX.nonPadLedControl(group, PioneerDDJRX.nonPadLeds.takeoverMinus, 0);
             PioneerDDJRX.syncRate[deck] = 0;
         }
     }
@@ -1529,9 +1529,8 @@ PioneerDDJRX.tempoResetButton = function(channel, control, value, status, group)
     var deck = PioneerDDJRX.channelGroups[group];
     if (value) {
         engine.setValue(group, "rate", 0);
+        PioneerDDJRX.updateTempoArrowLeds(group);
         if (PioneerDDJRX.syncRate[deck] !== engine.getValue(group, "rate")) {
-            PioneerDDJRX.nonPadLedControl(group, PioneerDDJRX.nonPadLeds.takeoverPlus, 0);
-            PioneerDDJRX.nonPadLedControl(group, PioneerDDJRX.nonPadLeds.takeoverMinus, 0);
             PioneerDDJRX.syncRate[deck] = 0;
         }
     }
@@ -1869,6 +1868,22 @@ PioneerDDJRX.nonPadLedControl = function(deck, ledNumber, active) {
     }
 };
 
+PioneerDDJRX.updateTempoArrowLeds = function(group) {
+    var rate = engine.getValue(group, "rate"),
+        deadZone = 0.001;
+
+    if (rate > deadZone) {
+        PioneerDDJRX.nonPadLedControl(group, PioneerDDJRX.nonPadLeds.takeoverPlus, false);
+        PioneerDDJRX.nonPadLedControl(group, PioneerDDJRX.nonPadLeds.takeoverMinus, true);
+    } else if (rate < -deadZone) {
+        PioneerDDJRX.nonPadLedControl(group, PioneerDDJRX.nonPadLeds.takeoverPlus, true);
+        PioneerDDJRX.nonPadLedControl(group, PioneerDDJRX.nonPadLeds.takeoverMinus, false);
+    } else {
+        PioneerDDJRX.nonPadLedControl(group, PioneerDDJRX.nonPadLeds.takeoverPlus, false);
+        PioneerDDJRX.nonPadLedControl(group, PioneerDDJRX.nonPadLeds.takeoverMinus, false);
+    }
+};
+
 PioneerDDJRX.illuminateFunctionControl = function(ledNumber, active) {
     var illuminationBaseChannel = 0x9B;
 
@@ -2020,21 +2035,13 @@ PioneerDDJRX.syncLed = function(value, group, control) {
     PioneerDDJRX.nonPadLedControl(group, PioneerDDJRX.nonPadLeds.sync, value);
     if (value) {
         PioneerDDJRX.syncRate[deck] = rate;
-        if (PioneerDDJRX.syncRate[deck] > 0) {
-            PioneerDDJRX.nonPadLedControl(group, PioneerDDJRX.nonPadLeds.takeoverMinus, 1);
-            PioneerDDJRX.nonPadLedControl(group, PioneerDDJRX.nonPadLeds.takeoverPlus, 0);
-        } else if (PioneerDDJRX.syncRate[deck] < 0) {
-            PioneerDDJRX.nonPadLedControl(group, PioneerDDJRX.nonPadLeds.takeoverMinus, 0);
-            PioneerDDJRX.nonPadLedControl(group, PioneerDDJRX.nonPadLeds.takeoverPlus, 1);
-        }
     }
     if (!value) {
         if (PioneerDDJRX.syncRate[deck] !== rate || rate === 0) {
-            PioneerDDJRX.nonPadLedControl(group, PioneerDDJRX.nonPadLeds.takeoverPlus, 0);
-            PioneerDDJRX.nonPadLedControl(group, PioneerDDJRX.nonPadLeds.takeoverMinus, 0);
             PioneerDDJRX.syncRate[deck] = 0;
         }
     }
+    PioneerDDJRX.updateTempoArrowLeds(group);
 };
 
 PioneerDDJRX.autoLoopLed = function(value, group, control) {
