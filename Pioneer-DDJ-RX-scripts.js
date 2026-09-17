@@ -110,6 +110,7 @@ PioneerDDJRX.soundColorFx = {
     0x12: { name: "Echo", preset: 10 },
     0x13: { name: "Moog Filter", preset: 14 }
 };
+PioneerDDJRX.defaultQuickEffectPreset = 14;
 
 
 ///////////////////////////////////////////////////////////////
@@ -420,6 +421,8 @@ PioneerDDJRX.init = function(id) {
 
     // initiate control status request:
     midi.sendShortMsg(0x9B, PioneerDDJRX.illuminationControl.djAppConnect, 0x7F);
+    engine.setValue("[QuickEffectRack1_[Channel1]]", "loaded_chain_preset", PioneerDDJRX.defaultQuickEffectPreset);
+    engine.setValue("[QuickEffectRack1_[Channel2]]", "loaded_chain_preset", PioneerDDJRX.defaultQuickEffectPreset);
     PioneerDDJRX.updateSoundColorFxLeds();
 
     // bind controls and init deck parameters:

@@ -281,6 +281,7 @@ Status: **Implemented and Verified**
 - **Sound Color FX Quick Effects**:
   - `FILTER` selects Moog Filter, `CRUSH` selects Bitcrusher, `NOISE` selects Filter Echo, and `PITCH` selects Echo for Channels 1 and 2 together.
   - `loaded_chain_preset` uses one-based indexes from Mixxx's Quick Effect preset list.
+  - Mixxx startup assigns Moog Filter (`loaded_chain_preset = 14`) to both Channel 1 and Channel 2 Quick Effect racks by default.
 - **Pitch Arrow LEDs**:
   - Tempo fader arrow LEDs indicate Mixxx `rate` direction per deck: one arrow for positive rate, the other for negative rate, and both off near center.
 - **Beat Grid Adjustment**:
